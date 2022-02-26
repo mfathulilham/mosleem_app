@@ -1,0 +1,74 @@
+unit Unit2;
+
+interface
+
+uses
+  Windows, Messages, SysUtils, Variants, Classes, Graphics, Controls, Forms,
+  Dialogs, pngimage, ExtCtrls, ImgList, StdCtrls, ComCtrls, MPlayer, jpeg;
+
+type
+  TForm2 = class(TForm)
+    Button1: TButton;
+    OpenDialog1: TOpenDialog;
+    Label1: TLabel;
+    MediaPlayer1: TMediaPlayer;
+    Timer1: TTimer;
+    ScrollBar1: TScrollBar;
+    Image1: TImage;
+    ListBox1: TListBox;
+    procedure FormCreate(Sender: TObject);
+    procedure Button1Click(Sender: TObject);
+    procedure Timer1Timer(Sender: TObject);
+    procedure ScrollBar1Scroll(Sender: TObject; ScrollCode: TScrollCode;
+      var ScrollPos: Integer);
+  private
+    { Private declarations }
+  public
+    { Public declarations }
+  end;
+
+var
+  Form2: TForm2;
+
+implementation
+
+{$R *.dfm}
+
+procedure TForm2.Button1Click(Sender: TObject);
+begin
+if OpenDialog1.Execute then
+ begin
+  OpenDialog1.InitialDir:=ExtractFilePath(Application.ExeName);
+  Timer1.Enabled:=false;
+  MediaPlayer1.filename:=OpenDialog1.FileName;
+  MediaPlayer1.Open;
+  ScrollBar1.max:=MediaPlayer1.TrackLength[1];
+  Timer1.Enabled:=true;
+ end;
+end;
+
+procedure TForm2.FormCreate(Sender: TObject);
+begin
+ Label1.Parent:=ScrollBar1;
+ label1.Left:=Round(ScrollBar1.Width/2);
+ label1.Top:=0;
+end;
+
+procedure TForm2.ScrollBar1Scroll(Sender: TObject; ScrollCode: TScrollCode;
+  var ScrollPos: Integer);
+begin
+  MediaPlayer1.Position:=ScrollBar1.Position;
+  MediaPlayer1.play;
+end;
+
+procedure TForm2.Timer1Timer(Sender: TObject);
+begin
+ ScrollBar1.Position:=MediaPlayer1.Position;
+ label1.Caption:=FormatFloat('0#.##',(ScrollBar1.Position/ScrollBar1.max)*100)+' %';
+
+ if MediaPlayer1.Position=ScrollBar1.Max then
+  MediaPlayer1.Stop;
+
+end;
+
+end.
